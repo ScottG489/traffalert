@@ -9,14 +9,14 @@ from xml.dom.minidom import *
 # TODO: Improve scraping of traffic data with current method.
 # TODO: Add testing! TDD from here forward!
 def main():
-    #start = sys.argv[1]
-    #end = sys.argv[2]
+    start = sys.argv[1]
+    end = sys.argv[2]
 
-    start = '19 kelly ave albany ny'
-    end = '16 sage estates albany ny'
-    temp = start
-    start = end
-    end = temp
+#    start = '19 kelly ave albany ny'
+#    end = '16 sage estates albany ny'
+#    temp = start
+#    start = end
+#    end = temp
 
     maps_url = 'http://maps.google.com/maps?saddr=%(start)s&daddr=%(end)s' %\
     {'start': start, 'end': end}
@@ -47,7 +47,7 @@ class RouteURL(object):
     def _url_to_dom(url):
         raw_map_html = urllib.urlopen(url).read()
 
-        traffic_html = re.search('<ol class="dir-altroute-mult dir-mrgn".*</ol>',
+        traffic_html = re.search('<ol class="dir-altroute-(mult|sngl) dir-mrgn".*</ol>',
                 raw_map_html).group()
 
         traffic_dom = parseString(traffic_html)
