@@ -3,12 +3,12 @@ import logging
 
 class ModelsHandler(object):
     def get_existing_user(self, openid_user):
-        logging.info('Getting existing user')
+        logging.info('Getting existing user if any')
         existing_user = db.GqlQuery('SELECT * FROM User WHERE user_id = :1', 
                 str(openid_user.user_id()))
         existing_user = list(existing_user)
         if existing_user:
-            logging.info('Existing user user_id: ' + existing_user[0].user_id)
+            logging.info('Got existing user user_id: ' + existing_user[0].user_id)
             return existing_user[0]
         logging.info('User doesn\'t exist')
 
@@ -19,7 +19,7 @@ class ModelsHandler(object):
         return list(alerts)
 
     def get_routes(self, user):
-        logging.info('Getting routes for user: ' + str(user))
+        logging.info('Getting routes for user: ' + str(user.user_id))
         routes = db.GqlQuery('SELECT * FROM Route WHERE user = :1',
                 user)
         return list(routes)
@@ -28,6 +28,7 @@ class ModelsHandler(object):
     # the models? This essentially makes a dict of user and all it's data, no
     # concrete structure like an object.
     def get_user_route_data(self, user):
+        logging.info('Getting route data from given user: ' + user.user_id)
         user_data = []
 
         routes = self.get_routes(user)
@@ -53,11 +54,13 @@ class ModelsHandler(object):
         return user
 
     def put_alert(self, route, days, time):
+        logging.info('Creating new alert')
         alert_model = Alert(route = route, days = days, time = time)
         alert_model.put()
         return alert_model
 
     def put_route(self, user, route):
+        logging.info('Creating new route')
         route_model = Route(user = user, start = route.start, end = route.end, name = route.name, distance =
                 route.distance, normal_duration = route.normal_duration)
         route_model.put()

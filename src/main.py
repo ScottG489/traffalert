@@ -24,6 +24,7 @@ class PageHandler(webapp2.RequestHandler):
 
 class MainPage(PageHandler):
     def get(self):
+        logging.info('Handling GET request')
         self.response.headers['Content-Type'] = 'text/html'
 
         models_handler = models.ModelsHandler()
@@ -51,6 +52,7 @@ class MainPage(PageHandler):
                     users.create_login_url(federated_identity='www.google.com/accounts/o8/id'))
 
     def post(self):
+        logging.info('Handling POST request')
         openid_user = users.get_current_user()
         if openid_user:  # signed in already
             models_handler = models.ModelsHandler()
@@ -94,6 +96,7 @@ class MainPage(PageHandler):
     def get_inputs(self):
         inputs = {}
         args = self.request.arguments()
+        logging.info('Getting request inputs from args: ' + str(args))
         for name in args:
             value = self.request.get_all(name)
             if name != 'days':
@@ -104,6 +107,7 @@ class MainPage(PageHandler):
         return inputs
 
     def write_user_route_data(self, route_data):
+        logging.info('Writing all user route data')
         for route in route_data:
             self.write_route(route['route'])
             for alert in route['alerts']:
@@ -125,6 +129,7 @@ class MainPage(PageHandler):
         self.write('</div>')
 
     def get_input_errors(self, inputs):
+        logging.info('Getting user input errors if any')
         errors = {}
         if not inputs.get('start'):
             errors['start_error'] = 'Required field'
@@ -138,6 +143,7 @@ class MainPage(PageHandler):
         return errors
 
     def is_valid_time(self, hour, minute):
+        logging.info('Validating time given: %s:%s' % (hour, minute))
         if not hour or not minute:
             return False
         hour = int(hour)
