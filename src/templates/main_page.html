@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+
 <html>
 <head>
   <title>Traffalert</title>
@@ -15,14 +17,14 @@
           </label>{{end_error}}
         <br>
         <label>Days
-          <input type="checkbox" name="days" value="SU" />S
-          <input type="checkbox" name="days" value="MO" />M
-          <input type="checkbox" name="days" value="TU" />T
-          <input type="checkbox" name="days" value="WE" />W
-          <input type="checkbox" name="days" value="TH" />T
-          <input type="checkbox" name="days" value="FR" />F
-          <input type="checkbox" name="days" value="SA" />S
-        </label>
+          {% for day in ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'] %}
+            {% if day in days %}
+              <input type="checkbox" name="days" value="{{day}}" checked/>{{day[0]}}
+              {% else %}
+                <input type="checkbox" name="days" value="{{day}}" />{{day[0]}}
+            {% endif %}
+          {% endfor %}
+        </label>{{days_error}}
         <br>
         <label>Time
           <input name="hour" type="text" size="1" value="{{hour}}">:
