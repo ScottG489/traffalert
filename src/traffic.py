@@ -2,12 +2,16 @@
 import urllib
 import re
 import sys
-from xml.dom.minidom import *
+import logging
+from xml.dom.minidom import parseString
+
 
 # TODO: Look into Google web service API's. They don't seem to take traffic data
 # into account but may be useful for other features.
 # TODO: Improve scraping of traffic data with current method.
 # TODO: Add testing! TDD from here forward!
+# TODO: Add a 'color' member to the Route object using Google's indicated
+# traffic status color.
 def main():
     start = sys.argv[1]
     end = sys.argv[2]
@@ -18,33 +22,42 @@ def main():
 #    start = end
 #    end = temp
 
-    maps_url = 'http://maps.google.com/maps?saddr=%(start)s&daddr=%(end)s' %\
-    {'start': start, 'end': end}
 
-    routes = RouteURL.parse(maps_url)
+    #routes = RouteHandler.get_routes(maps_url)
+    router = RouteHandler()
+    routes = router.get_routes(start, end)
 
     for route in routes:
         if route.name:
-            print route.traffic_duration
+            print route
         else:
             print 'No traffic raw_map_html'
 
-class RouteURL(object):
-    @staticmethod
-    def parse(google_maps_url):
-        routes_dom = RouteURL._url_to_dom(google_maps_url)
+class RouteHandler(object):
+    def __init__(self):
+        self.google_maps_url = 'http://maps.google.com/maps?saddr=%(start)s&daddr=%(end)s'
+
+    def get_routes(self, start, end):
+        logging.info('Looking for routes from %s to %s' % (start, end))
+        routes_dom = self._url_to_dom(self.google_maps_url % 
+                {'start': start, 'end': end})
 
         routes = []
 
         dom_routes = routes_dom.getElementsByTagName('li')
         for dom_route in dom_routes:
-            route = RouteURL._dom_to_Route(dom_route)
+            route = self._dom_to_Route(dom_route)
+            route.start = start
+            route.end = end
+
             routes.append(route)
 
         return routes
 
-    @staticmethod
-    def _url_to_dom(url):
+    def get_route(self, start, end):
+        return self.get_routes(start, end)[0]
+
+    def _url_to_dom(self, url):
         raw_map_html = urllib.urlopen(url).read()
 
         traffic_html = re.search('<ol class="dir-altroute-(mult|sngl) dir-mrgn".*</ol>',
@@ -54,8 +67,7 @@ class RouteURL(object):
 
         return traffic_dom
 
-    @staticmethod
-    def _dom_to_Route(dom_route):
+    def _dom_to_Route(self, dom_route):
         route = Route()
         traffic_data_found = False
 
@@ -68,24 +80,34 @@ class RouteURL(object):
                 route.traffic_duration = \
                 div.getElementsByTagName('span')[0].firstChild.data.strip()
                 traffic_data_found = True
+
+                for item in div.getElementsByTagName('img'):
+                    route.traffic_color = re.search('^dir-traffic dir-traffic-(.*)',
+                            item.getAttribute('class')).group(1)
+
             elif not div.hasAttributes():
                 route.name = div.firstChild.data
         if not traffic_data_found:
             route.traffic_duration = u'No traffic information'
+            route.traffic_color = u'gray'
 
         return route
 
 
 class Route(object):
     def __init__(self):
+        self.start = ''
+        self.end = ''
         self.name = ''
         self.distance = ''
         self.normal_duration = ''
         self.traffic_duration = ''
+        self.traffic_color = ''
 
     def __str__(self):
-        return str({'name': self.name, 'distance': self.distance,\
+        return str({'start': self.start, 'end': self.end, 'name': self.name, 'distance': self.distance,
                 'normal_duration': self.normal_duration, 'traffic_duration':
-                self.traffic_duration})
+                self.traffic_duration, 'traffic_color': self.traffic_color})
 
-main()
+if __name__ == '__main__':
+    main()

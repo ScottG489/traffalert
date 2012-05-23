@@ -1,0 +1,35 @@
+<html>
+<head>
+  <title>Traffalert</title>
+  <!--<link rel="stylesheet" type="text/css" href="signup.css" />-->
+</head>
+<body>
+    <h1>Traffalert</h1>
+    <form method="post">
+        <label>Start
+          <input name="start" type="text" value="{{start}}">
+        </label>{{start_error}}
+        <br>
+        <label>End
+          <input name="end" type="text" value="{{end}}">
+          </label>{{end_error}}
+        <br>
+        <label>Days
+          <input type="checkbox" name="days" value="SU" />S
+          <input type="checkbox" name="days" value="MO" />M
+          <input type="checkbox" name="days" value="TU" />T
+          <input type="checkbox" name="days" value="WE" />W
+          <input type="checkbox" name="days" value="TH" />T
+          <input type="checkbox" name="days" value="FR" />F
+          <input type="checkbox" name="days" value="SA" />S
+        </label>
+        <br>
+        <label>Time
+          <input name="hour" type="text" size="1" value="{{hour}}">:
+          <input name="minute" type="text" size="1" value="{{minute}}">
+        </label>{{time_error}}
+        <br>
+        <input type="submit" />
+    </form>
+</body>
+</html>
