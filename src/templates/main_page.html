@@ -16,12 +16,14 @@
           <input name="end" type="text" value="{{end}}">
           </label>{{end_error}}
         <br>
+          {{route_error}}
+        <br>
         <label>Days
           {% for day in ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'] %}
             {% if day in days %}
               <input type="checkbox" name="days" value="{{day}}" checked/>{{day[0]}}
-              {% else %}
-                <input type="checkbox" name="days" value="{{day}}" />{{day[0]}}
+            {% else %}
+              <input type="checkbox" name="days" value="{{day}}" />{{day[0]}}
             {% endif %}
           {% endfor %}
         </label>{{days_error}}

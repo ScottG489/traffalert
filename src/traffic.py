@@ -42,9 +42,11 @@ class RouteHandler(object):
         routes_dom = self._url_to_dom(self.google_maps_url % 
                 {'start': start, 'end': end})
 
-        routes = []
+        if not routes_dom:
+            return None
 
         dom_routes = routes_dom.getElementsByTagName('li')
+        routes = []
         for dom_route in dom_routes:
             route = self._dom_to_Route(dom_route)
             route.start = start
@@ -55,17 +57,21 @@ class RouteHandler(object):
         return routes
 
     def get_route(self, start, end):
-        return self.get_routes(start, end)[0]
+        routes = self.get_routes(start, end)
+        if routes:
+            return self.get_routes(start, end)[0]
 
     def _url_to_dom(self, url):
         raw_map_html = urllib.urlopen(url).read()
 
         traffic_html = re.search('<ol class="dir-altroute-(mult|sngl) dir-mrgn".*</ol>',
-                raw_map_html).group()
+                raw_map_html)
 
-        traffic_dom = parseString(traffic_html)
+        if traffic_html:
+            traffic_html = traffic_html.group()
+            traffic_dom = parseString(traffic_html)
 
-        return traffic_dom
+            return traffic_dom
 
     def _dom_to_Route(self, dom_route):
         route = Route()

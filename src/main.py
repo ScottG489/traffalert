@@ -69,20 +69,23 @@ class MainPage(PageHandler):
 
             inputs = self.get_inputs()
             errors = self.get_input_errors(inputs)
+
+            route = None
+            if not errors:
+                router = traffic.RouteHandler()
+                route = router.get_route(inputs.get('start'),
+                        inputs.get('end'))
+
+                if route:
+                    route = models_handler.put_route(user, route)
+                    time = datetime.time(int(inputs['hour']), int(inputs['minute']))
+                    models_handler.put_alert(route, inputs['days'], time)
+                else:
+                    errors.update({'route_error': 'No results for this route'})
+
             params = {}
             params.update(inputs)
             params.update(errors)
-
-            routes = None
-            if not errors:
-                router = traffic.RouteHandler()
-                routes = router.get_routes(inputs.get('start'),
-                        inputs.get('end'))
-
-                route = models_handler.put_route(user, routes[0])
-                time = datetime.time(int(inputs['hour']), int(inputs['minute']))
-                models_handler.put_alert(route, inputs['days'], time)
-
 
             route_data = models_handler.get_user_route_data(user)
             self.write_template('main_page.html', **params)
@@ -123,7 +126,7 @@ class MainPage(PageHandler):
         self.write('<b>Duration: </b>' + route.normal_duration + '<br /><br />')
 
     def write_alert(self, alert):
-        self.write('<div style="margin-left: 100px">')
+        self.write('<div style="margin-left: 75px">')
         self.write('<b>Days: </b>' + str(alert.days) + '<br />')
         self.write('<b>Time: </b>' + str(alert.time) + '<br /><br />')
         self.write('</div>')
