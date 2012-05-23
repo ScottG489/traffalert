@@ -72,7 +72,7 @@ class MainPage(PageHandler):
         args = self.request.arguments()
         for name in args:
             value = self.request.get_all(name)
-            if len(value) == 1:
+            if name != 'days':
                 inputs[name] = value[0]
             else:
                 inputs[name] = value
