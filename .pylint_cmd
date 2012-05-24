@@ -1,0 +1,18 @@
+#pylint -d C0111,W0511,C0103,R0904,W0231,E1103 -r n *.py
+#export PYTHONPATH=$PYTHONPATH:/home/scott/school/capstone/Task-Organizer/src/task/
+#export PYTHONPATH=$PYTHONPATH:/home/scott/school/capstone/Task-Organizer/src/test/
+#export PYTHONPATH=$PYTHONPATH:/home/scott/school/capstone/Task-Organizer/src/examples/
+source .path_cmd
+
+source .clean_cmd
+
+IGNORE=""
+IGNORE="-d C0111"
+
+cd src
+pylint $IGNORE -r n *.py
+cd ..
+
+cd test
+pylint $IGNORE -r n test*
+cd ..

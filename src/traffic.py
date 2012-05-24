@@ -56,7 +56,7 @@ class RouteHandler(object):
 
         return routes
 
-    def get_route(self, start, end):
+    def get_live_route(self, start, end):
         routes = self.get_routes(start, end)
         if routes:
             return self.get_routes(start, end)[0]
@@ -64,7 +64,8 @@ class RouteHandler(object):
     def _url_to_dom(self, url):
         raw_map_html = urllib.urlopen(url).read()
 
-        traffic_html = re.search('<ol class="dir-altroute-(mult|sngl) dir-mrgn".*</ol>',
+        traffic_html = re.search(
+                '<ol class="dir-altroute-(mult|sngl) dir-mrgn".*</ol>',
                 raw_map_html)
 
         if traffic_html:
@@ -88,7 +89,8 @@ class RouteHandler(object):
                 traffic_data_found = True
 
                 for item in div.getElementsByTagName('img'):
-                    route.traffic_color = re.search('^dir-traffic dir-traffic-(.*)',
+                    route.traffic_color = re.search(
+                            '^dir-traffic dir-traffic-(.*)',
                             item.getAttribute('class')).group(1)
 
             elif not div.hasAttributes():
@@ -111,9 +113,10 @@ class Route(object):
         self.traffic_color = ''
 
     def __str__(self):
-        return str({'start': self.start, 'end': self.end, 'name': self.name, 'distance': self.distance,
-                'normal_duration': self.normal_duration, 'traffic_duration':
-                self.traffic_duration, 'traffic_color': self.traffic_color})
+        return str({'start': self.start, 'end': self.end, 'name': self.name,
+            'distance': self.distance, 'normal_duration': self.normal_duration,
+            'traffic_duration': self.traffic_duration,
+            'traffic_color': self.traffic_color})
 
 if __name__ == '__main__':
     main()

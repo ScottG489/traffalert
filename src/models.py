@@ -26,9 +26,11 @@ class ModelsHandler(object):
 
     # TODO: Should make objects for user, route, and alarm that's separate from
     # the models? This essentially makes a dict of user and all it's data, no
-    # concrete structure like an object.
-    def get_user_route_data(self, user):
-        logging.info('Getting route data from given user: ' + user.user_id)
+    # concrete structure like an object. Also the structure is weird, no actual
+    # user information is returned. Review heirarchy.
+    def get_user_data(self, user):
+        'Get hashmap of user data containing routes and their alerts'
+        logging.info('Getting data from given user: ' + user.user_id)
         user_data = []
 
         routes = self.get_routes(user)
@@ -46,6 +48,7 @@ class ModelsHandler(object):
 
         return user_data
 
+
     def create_new_user(self, openid_user):
         logging.info('Creating new user')
         user = User(user_id = openid_user.user_id(), nickname =
@@ -61,8 +64,9 @@ class ModelsHandler(object):
 
     def put_route(self, user, route):
         logging.info('Creating new route')
-        route_model = Route(user = user, start = route.start, end = route.end, name = route.name, distance =
-                route.distance, normal_duration = route.normal_duration)
+        route_model = Route(user = user, start = route.start, end = route.end,
+                name = route.name, distance = route.distance,
+                normal_duration = route.normal_duration)
         route_model.put()
 
         return route_model

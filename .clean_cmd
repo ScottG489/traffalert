@@ -1,0 +1,2 @@
+trash-put /home/scott/development/traffalert/test/*.pyc
+trash-put /home/scott/development/traffalert/src/*.pyc

@@ -11,12 +11,12 @@ import traffic
 import models
 from crons import CronJobs
 
-template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir))
+TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+JINJA_ENV = jinja2.Environment(loader = jinja2.FileSystemLoader(TEMPLATE_DIR))
 
 class PageHandler(webapp2.RequestHandler):
     def write_template(self, template_file, **params):
-        template = jinja_env.get_template(template_file)
+        template = JINJA_ENV.get_template(template_file)
         self.response.out.write(template.render(params))
 
     def write(self, string):
@@ -38,18 +38,22 @@ class MainPage(PageHandler):
             else:
                 user = existing_user
 
-            self.response.out.write('Hello <em>%s</em>! [<a href="%s">sign out</a>]' % (
+            self.response.out.write('Hello <em>%s</em>!\
+                    [<a href="%s">sign out</a>]' % (
                     user.nickname, users.create_logout_url(self.request.uri)))
 
             self.write_template('main_page.html')
 
-            route_data = models_handler.get_user_route_data(user)
+            route_data = models_handler.get_user_data(user)
             self.write_user_route_data(route_data)
 
         else:     # let openid_user choose authenticator
             self.response.out.write('Hello world! Sign in at: ')
             self.write('<a href="%s" >login</a><br />' %
-                    users.create_login_url(federated_identity='www.google.com/accounts/o8/id'))
+                    users.create_login_url(
+                            federated_identity='www.google.com/accounts/o8/id'
+                    )
+            )
 
     def post(self):
         logging.info('Handling POST request')
@@ -64,7 +68,8 @@ class MainPage(PageHandler):
             else:
                 user = existing_user
 
-            self.response.out.write('Hello <em>%s</em>! [<a href="%s">sign out</a>]' % (
+            self.response.out.write('Hello <em>%s</em>!\
+                    [<a href="%s">sign out</a>]' % (
                     user.nickname, users.create_logout_url(self.request.uri)))
 
             inputs = self.get_inputs()
@@ -73,7 +78,7 @@ class MainPage(PageHandler):
             route = None
             if not errors:
                 router = traffic.RouteHandler()
-                route = router.get_route(inputs.get('start'),
+                route = router.get_live_route(inputs.get('start'),
                         inputs.get('end'))
 
                 if route:
@@ -87,14 +92,17 @@ class MainPage(PageHandler):
             params.update(inputs)
             params.update(errors)
 
-            route_data = models_handler.get_user_route_data(user)
+            route_data = models_handler.get_user_data(user)
             self.write_template('main_page.html', **params)
             self.write_user_route_data(route_data)
 
         else:     # TODO: let openid_user choose authenticator
             self.response.out.write('Hello world! Sign in at: ')
             self.write('<a href="%s" >login</a><br/>' %
-                    users.create_login_url(federated_identity='www.google.com/accounts/o8/id'))
+                    users.create_login_url(
+                            federated_identity='www.google.com/accounts/o8/id'
+                    )
+            )
 
     def get_inputs(self):
         inputs = {}

@@ -1,0 +1,7 @@
+screen -t server
+screen -t git
+
+screen -t main vim src/main.py
+screen -t models vim src/models.py
+screen -t traffic vim src/traffic.py
+screen -t crons vim src/crons.py
